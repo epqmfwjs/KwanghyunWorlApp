@@ -19,10 +19,18 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.KwanghunWorldApp",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "97c79136-3adc-4491-a4c7-67bda09947c2"
+      }
+    },
+    "owner": "choikwanghyun"
   }
 }

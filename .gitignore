@@ -34,3 +34,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+
+# Firebase 설정 파일
+**/google-services.json
+**/*firebase-adminsdk*.json
