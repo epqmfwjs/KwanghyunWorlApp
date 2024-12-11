@@ -3,8 +3,14 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-import axios from 'axios';
+import axios from './utils/axiosConfig';
 import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ChatScreen from './components/ChatScreen';
+import UserListScreen from './components/UserListScreen';
+
+const Stack = createNativeStackNavigator();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -24,7 +30,7 @@ export default function App() {
   const sendTokenToServer = async (token) => {
     try {
       console.log('Sending FCM token to server:', token);
-      const response = await axios.post('https://gogolckh.ddns.net:10/api/notification/register', {
+        const response = await axios.post('/api/notification/register', {
         userId: 'device-' + Date.now(),
         token: token
       }, {
@@ -61,28 +67,79 @@ export default function App() {
     };
   }, []);
 
-  return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
-      <View style={styles.header}>
-        <Text style={styles.title}>KwanghunWorld App</Text>
+  function HomeScreen({ navigation }) {
+    return (
+      <View style={styles.container}>
+        <StatusBar style="dark" />
+        <View style={styles.header}>
+          <Text style={styles.title}>KwanghunWorld App</Text>
+        </View>
+        
+        {notification && (
+          <View style={styles.notificationContainer}>
+            <Text style={styles.notificationTitle}>마지막 알림:</Text>
+            <Text style={styles.notificationContent}>{notification.request.content.title}</Text>
+            <Text style={styles.notificationContent}>{notification.request.content.body}</Text>
+          </View>
+        )}
+  
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
+  
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={styles.button}
+            onPress={() => navigation.navigate('Chat')}
+          >
+            <Text style={styles.buttonText}>채팅 참여하기</Text>
+          </TouchableOpacity>
+  
+          <TouchableOpacity 
+            style={[styles.button, styles.userListButton]}
+            onPress={() => navigation.navigate('UserList')}
+          >
+            <Text style={styles.buttonText}>접속 유저</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      {/* <Text style={styles.subtitle}>FCM 토큰:</Text>
-      <Text style={styles.token}>{fcmToken}</Text> */}
-      {notification && (
-        <View style={styles.notificationContainer}>
-          <Text style={styles.notificationTitle}>마지막 알림:</Text>
-          <Text style={styles.notificationContent}>{notification.request.content.title}</Text>
-          <Text style={styles.notificationContent}>{notification.request.content.body}</Text>
-        </View>
-      )}
+    );
+  }
 
-      {errorMessage ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{errorMessage}</Text>
-        </View>
-      ) : null}
-    </View>
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen 
+          name="Home" 
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="Chat" 
+          component={ChatScreen}
+          options={{ 
+            title: 'KwanghunWorld 채팅',
+            headerStyle: {
+              backgroundColor: '#87CEEB',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
+        <Stack.Screen 
+          name="UserList" 
+          component={UserListScreen}
+          options={{ 
+            title: '접속 유저 목록',
+            headerStyle: {
+              backgroundColor: '#87CEEB',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -122,7 +179,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     padding: 20,
     paddingTop: Constants.statusBarHeight,
   },
@@ -185,5 +242,48 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 16,
     color: '#721c24',
+  },
+  chatButton: {
+    backgroundColor: '#87CEEB',
+    padding: 15,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  chatButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    width: '80%',
+    alignItems: 'center',
+    gap: 15,
+  },
+  button: {
+    backgroundColor: '#87CEEB',
+    padding: 15,
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  userListButton: {
+    backgroundColor: '#82C8B3',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
