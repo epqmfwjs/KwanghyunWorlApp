@@ -11,6 +11,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import ChatScreen from './components/ChatScreen';
 import UserListScreen from './components/UserListScreen';
 import MoveSite from './components/MoveSite';
+import UpdateListScreen from './components/UpdateListScreen';
+import UpdateCreateScreen from './components/UpdateCreateScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -98,6 +100,13 @@ export default function App() {
 
           <TouchableOpacity 
             style={[styles.button, styles.buttonShadow]}
+            onPress={() => navigation.navigate('UpdateList')}
+          >
+            <Text style={styles.buttonText}>업데이트 리스트</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.button, styles.buttonShadow]}
             onPress={() => MoveSite()}
           >
             <Text style={styles.buttonText}>사이트 이동</Text>
@@ -145,6 +154,28 @@ export default function App() {
           component={UserListScreen}
           options={{ 
             title: '접속 유저 목록',
+            headerStyle: {
+              backgroundColor: '#4c669f',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
+        <Stack.Screen 
+          name="UpdateList" 
+          component={UpdateListScreen}
+          options={{ 
+            title: '업데이트 리스트',
+            headerStyle: {
+              backgroundColor: '#4c669f',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
+        <Stack.Screen 
+          name="UpdateCreate" 
+          component={UpdateCreateScreen}
+          options={{ 
+            title: '업데이트 등록',
             headerStyle: {
               backgroundColor: '#4c669f',
             },
