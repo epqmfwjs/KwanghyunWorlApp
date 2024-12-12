@@ -7,8 +7,10 @@ import axios from './utils/axiosConfig';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { LinearGradient } from 'expo-linear-gradient';
 import ChatScreen from './components/ChatScreen';
 import UserListScreen from './components/UserListScreen';
+import MoveSite from './components/MoveSite';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,8 +32,8 @@ export default function App() {
   const sendTokenToServer = async (token) => {
     try {
       console.log('Sending FCM token to server:', token);
-        const response = await axios.post('/api/notification/register', {
-        userId: 'device-' + Date.now(),
+      const response = await axios.post('/api/notification/register', {
+        userId: DEVICE_ID,
         token: token
       }, {
         headers: {
@@ -69,12 +71,39 @@ export default function App() {
 
   function HomeScreen({ navigation }) {
     return (
-      <View style={styles.container}>
-        <StatusBar style="dark" />
+      <LinearGradient
+        colors={['#192f6a','#d04a4a', '#e6bc4b']}
+        //colors={['#4c669f', '#3b5998', '#192f6a']}
+        style={styles.container}
+      >
+        <StatusBar style="light" />
         <View style={styles.header}>
-          <Text style={styles.title}>KwanghunWorld App</Text>
+          <Text style={styles.title}>KwanghunWorld</Text>
+          <Text style={styles.subtitle}>Admin Hub</Text>
         </View>
-        
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={[styles.button, styles.buttonShadow]}
+            onPress={() => navigation.navigate('Chat')}
+          >
+            <Text style={styles.buttonText}>채팅 참여하기</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.button, styles.buttonShadow]}
+            onPress={() => navigation.navigate('UserList')}
+          >
+            <Text style={styles.buttonText}>접속 유저</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.button, styles.buttonShadow]}
+            onPress={() => MoveSite()}
+          >
+            <Text style={styles.buttonText}>사이트 이동</Text>
+          </TouchableOpacity>
+        </View>
+
         {notification && (
           <View style={styles.notificationContainer}>
             <Text style={styles.notificationTitle}>마지막 알림:</Text>
@@ -82,29 +111,13 @@ export default function App() {
             <Text style={styles.notificationContent}>{notification.request.content.body}</Text>
           </View>
         )}
-  
+
         {errorMessage ? (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{errorMessage}</Text>
           </View>
         ) : null}
-  
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={() => navigation.navigate('Chat')}
-          >
-            <Text style={styles.buttonText}>채팅 참여하기</Text>
-          </TouchableOpacity>
-  
-          <TouchableOpacity 
-            style={[styles.button, styles.userListButton]}
-            onPress={() => navigation.navigate('UserList')}
-          >
-            <Text style={styles.buttonText}>접속 유저</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      </LinearGradient>
     );
   }
 
@@ -122,7 +135,7 @@ export default function App() {
           options={{ 
             title: 'KwanghunWorld 채팅',
             headerStyle: {
-              backgroundColor: '#87CEEB',
+              backgroundColor: '#4c669f',
             },
             headerTintColor: '#fff',
           }}
@@ -133,7 +146,7 @@ export default function App() {
           options={{ 
             title: '접속 유저 목록',
             headerStyle: {
-              backgroundColor: '#87CEEB',
+              backgroundColor: '#4c669f',
             },
             headerTintColor: '#fff',
           }}
@@ -163,7 +176,6 @@ async function registerForPushNotificationsAsync() {
       return;
     }
 
-    // FCM 토큰 받기
     const token = await Notifications.getDevicePushTokenAsync({
       projectId: Constants.expoConfig.extra.eas.projectId,
     });
@@ -177,7 +189,6 @@ async function registerForPushNotificationsAsync() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -187,103 +198,78 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 40,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
+    fontSize: 42,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 5,
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
-    marginBottom: 10,
+    color: '#E0E0E0',
+    letterSpacing: 1,
   },
-  token: {
-    fontSize: 14,
-    color: '#333',
-    marginBottom: 20,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 10,
-    padding: 10,
+  buttonContainer: {
+    width: '85%',
+    alignItems: 'center',
+    gap: 20,
+  },
+  button: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: 18,
+    borderRadius: 15,
+    width: '100%',
+    alignItems: 'center',
+  },
+  buttonShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  buttonText: {
+    color: '#2c3e50',
+    fontSize: 18,
+    fontWeight: '600',
   },
   notificationContainer: {
-    marginTop: 20,
+    marginTop: 30,
     padding: 20,
-    backgroundColor: 'rgba(135, 206, 235, 0.8)',
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 15,
     width: '100%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 7,
   },
   notificationTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 12,
+    color: '#2c3e50',
   },
   notificationContent: {
     fontSize: 16,
-    color: '#666',
+    color: '#34495e',
+    lineHeight: 22,
   },
   errorContainer: {
     marginTop: 20,
     padding: 20,
-    backgroundColor: '#f8d7da',
-    borderRadius: 10,
+    backgroundColor: 'rgba(244, 67, 54, 0.95)',
+    borderRadius: 15,
     width: '100%',
   },
   errorText: {
     fontSize: 16,
-    color: '#721c24',
-  },
-  chatButton: {
-    backgroundColor: '#87CEEB',
-    padding: 15,
-    borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
-    marginTop: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  chatButtonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  buttonContainer: {
-    width: '80%',
-    alignItems: 'center',
-    gap: 15,
-  },
-  button: {
-    backgroundColor: '#87CEEB',
-    padding: 15,
-    borderRadius: 10,
-    width: '100%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  userListButton: {
-    backgroundColor: '#82C8B3',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
 });
